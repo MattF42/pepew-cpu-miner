@@ -33,7 +33,6 @@ static inline void blake3(const uint8_t *input, int len, uint8_t *output)
 #define NONCE_SIZE (12)
 #define OUTPUT_SIZE (MEMSIZE * 8)
 #define CHUNKS (4)
-#define INPUT_LEN (112)
 
 
 void xel_stage_1(const uint8_t *input, size_t input_len, uint8_t scratch_pad[OUTPUT_SIZE])
@@ -43,7 +42,7 @@ void xel_stage_1(const uint8_t *input, size_t input_len, uint8_t scratch_pad[OUT
 	uint8_t buffer[CHUNK_SIZE * 2];
 	//memcpy(key, input, INPUT_LEN);
 	memcpy(key, input, sizeof(input));
-	blake3(input, INPUT_LEN, buffer);
+	blake3(input, input_len, buffer);
 
 	uint8_t *t = scratch_pad;
 
@@ -308,16 +307,18 @@ void xel_stage_3(uint64_t *scratch)
 
 void xelisv2_hash(const char* input, char* output, uint32_t len)
 {
-	if (opt_debug)
-                                applog(LOG_DEBUG, "XelisV2: %s %d\n", input, len);
+	// if (opt_debug)
+                                // applog(LOG_DEBUG, "XelisV2: %s %d\n", input, len);
                         uint64_t *scratch = (uint64_t *)calloc(MEMSIZE, sizeof(uint64_t));
                         uint8_t *scratch_uint8 = (uint8_t *)scratch;
 
                         uint8_t scratch_pad[OUTPUT_SIZE];
-                        xel_stage_1(input, scratch, len);
+                        xel_stage_1((uint8_t*)input, sizeof(input), scratch_pad);
+			// void xel_stage_1(const uint8_t *input, size_t input_len, uint8_t scratch_pad[OUTPUT_SIZE])
                         xel_stage_3(scratch);
                         blake3((uint8_t*)scratch, OUTPUT_SIZE, output);
     			// memcpy(output, hashResult, 32);
+		        free(scratch);	
                         return;
 }
 
