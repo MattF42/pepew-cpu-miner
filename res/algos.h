@@ -73,6 +73,7 @@ enum algos {
 	ALGO_X17,         /* X17 */
 	ALGO_0X10,        /* 0x10 (Chain0x [CHOX])*/
 	ALGO_X20R,
+	ALGO_XELISV2,        /* XelisV2  (PepePOW Hard Fork) */
 	ALGO_XEVAN,
 	ALGO_YESCRYPT,
 	ALGO_YESCRYPTR8,
@@ -168,6 +169,7 @@ static const char *algo_names[] = {
 	"x17",
 	"0x10",
 	"x20r",
+	"xelisv2",
 	"xevan",
 	"yescrypt",
 	"yescryptR8",

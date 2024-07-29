@@ -45,6 +45,17 @@ cpuminer_SOURCES = \
   sha3/gost_streebog.c \
   crypto/blake2s.c \
   crypto/blake2b.c \
+  crypto/blake3.c \
+  crypto/blake3_dispatch.c \
+  crypto/blake3_portable.c \
+  crypto/blake3_sse2.c \
+  crypto/blake3_sse41.c \
+  crypto/blake3_avx2.c \
+  crypto/chacha20.c \
+  crypto/chacha20_dispatch.c \
+  crypto/chacha20_sse2.c \
+  crypto/chacha20_avx2.c \
+  crypto/cpu-features.c \
   crypto/oaes_lib.c \
   crypto/c_keccak.c \
   crypto/c_groestl.c \
@@ -100,6 +111,7 @@ cpuminer_SOURCES = \
   algo/lyra2v3.c \
   algo/megabtx.c \
   algo/memehash.c \
+  algo/xelisv2.c \
   algo/myr-groestl.c \
   algo/mike.c \
   algo/minotaur.c \

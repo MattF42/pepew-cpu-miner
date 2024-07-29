@@ -255,6 +255,7 @@ Options:\n\
                           x17            X17\n\
                           0x10           0X10 (Chain0x [CHOX])\n\
                           x20r           X20R\n\
+                          xelisv2        XelisV2 (PepePoW)\n\
                           xevan          Xevan (BitSend)\n\
                           yescrypt       Yescrypt for XMY, BSTY, and QBC\n\
                           yescryptR8     YescryptR8 for KOTO\n\
@@ -2216,6 +2217,7 @@ static void *miner_thread(void *userdata)
 				max64 = 0x3ffff;
 				break;
 			case ALGO_MEME:
+			case ALGO_XELISV2:
 				max64 = 0x9ffffLL;
 				break;
 			case ALGO_SKEIN:
@@ -2467,6 +2469,9 @@ static void *miner_thread(void *userdata)
 			break;
 		case ALGO_0X10:
 			rc = scanhash_0x10(thr_id, &work, max_nonce, &hashes_done);
+			break;
+		case ALGO_XELISV2:
+			rc = scanhash_xelisv2(thr_id, &work, max_nonce, &hashes_done);
 			break;
 		case ALGO_XEVAN:
 			rc = scanhash_xevan(thr_id, &work, max_nonce, &hashes_done);
