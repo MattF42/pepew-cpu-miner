@@ -21,6 +21,10 @@ void meme_hash(const char* input, char* output, uint32_t len)
 	sph_echo512_context      ctx_echo1;
     sph_sha256_context       ctx_sha;
 
+    // if (opt_debug) {
+                                 // applog(LOG_DEBUG, "meme_hash input: %x \n",input);
+        // }
+
     uint32_t hash[16];
     uint32_t hashA[16];
 
@@ -83,6 +87,10 @@ int scanhash_meme(int thr_id, struct work *work, uint32_t max_nonce, uint64_t *h
                 be32enc(&endiandata[19], n);
                 meme_hash((char*) endiandata, (char*) vhash, 80);
                 if (vhash[7] < Htarg && fulltest(vhash, ptarget)) {
+		if (opt_debug) {
+                                 applog(LOG_DEBUG, "FOUND memehash hash: %x \n",vhash);
+                                 applog(LOG_DEBUG, "memehash vhash[7]: %x vs %x\n",vhash[7], Htarg);
+                }
                         work_set_target_ratio( work, vhash );
                         *hashes_done = n - first_nonce + 1;
                         pdata[19] = n;
