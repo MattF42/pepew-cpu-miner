@@ -41,8 +41,8 @@ void xel_stage_1(const uint8_t *input, size_t input_len, uint8_t scratch_pad[OUT
 	uint8_t key[CHUNK_SIZE * CHUNKS] = {0};
 	uint8_t input_hash[HASH_SIZE];
 	uint8_t buffer[CHUNK_SIZE * 2];
-	// memcpy(key, input, INPUT_LEN);
-	memcpy(key, input, sizeof(input));
+	memcpy(key, input, INPUT_LEN);
+	// memcpy(key, input, sizeof(input));
 	blake3(input, input_len, buffer);
 
 	uint8_t *t = scratch_pad;
@@ -306,7 +306,6 @@ void xel_stage_3(uint64_t *scratch)
 	}
 }
 
-// void xelisv2_hash(const uint32_t* input, uint32_t* output)
 #define XEL_INPUT_LEN (112)
 void xelisv2_hash(const uint32_t* input, uint32_t* output)
 {
@@ -314,57 +313,15 @@ void xelisv2_hash(const uint32_t* input, uint32_t* output)
 	uint8_t *xel_input = (uint8_t *)calloc(INPUT_LEN, sizeof(uint8_t));
         uint64_t *scratch = (uint64_t *)calloc(MEMSIZE, sizeof(uint64_t));
         uint8_t *scratch_uint8 = (uint8_t *)scratch;
+	uint8_t hash[HASHSIZE];
+	int len=80; // #FixMe
 
-	/*
-			 if (opt_debug) {
-				 for(int i=0;i<20;++i) {
-					printf("%" PRIu32, input[i]);
-				  }
-				 printf(" - hash input\n");
-			 } */
-
-
-	                // Better hope we are Little Endian....
-			for (int i=0; i<21; ++i) {
-				xel_input[(4*i)]  = (uint8_t)(input[i] >> 24); 
-				xel_input[(4*i)+1]  = (uint8_t)(input[i] >> 16);
-				xel_input[(4*i)+2]  = (uint8_t)(input[i] >> 8); 
-				xel_input[(4*i)+3]    = (uint8_t)input[i];      
-			}
-			
-
+			memcpy(xel_input, input, len);
                         xel_stage_1(xel_input, XEL_INPUT_LEN, scratch_uint8);
-			/*
-			 if (opt_debug) {
-				  printf("Stage 1 returns \n");
-				 for(int i=0;i<HASHSIZE;++i) {
-					printf("%u", scratch_uint8[i]);
-				  }
-				 printf("\n");
-			 } */
-			// void xel_stage_1(const uint8_t *input, size_t input_len, uint8_t scratch_pad[OUTPUT_SIZE])
                         xel_stage_3(scratch);
-			/*
-			 if (opt_debug) {
-				  printf("Stage 3 returns \n");
-				 for(int i=0;i<10;++i) {
-					printf("%lu", scratch[i]);
-				  }
-				 printf("\n");
-			 }
-			 */
-			uint8_t hash[HASHSIZE];
                         blake3(scratch_uint8, OUTPUT_SIZE, hash);
-			if (opt_debug) {
-				 for(int i=0;i<HASHSIZE;++i) {
-			            printf("%" PRIu8 , hash[i]);
-				 }
-				 printf(" - our hash\n");
-			}
-			 uint32_t i32 = hash[0] | (hash[1] << 8) | (hash[2] << 16) | (hash[3] << 24);
-			 printf("Our has as uint32_t is %u\n",i32);
 
-			memcpy(output,hash,HASHSIZE*sizeof(uint8_t));
+			memcpy(output,hash,HASHSIZE*sizeof(uint8_t)); // Back to uint_32t
 		        free(scratch);	
 		        free(xel_input);	
                         return;
@@ -382,7 +339,6 @@ int scanhash_xelisv2(int thr_id, struct work *work, uint32_t max_nonce, uint64_t
         uint32_t nonce = first_nonce;
         volatile uint8_t *restart = &(work_restart[thr_id].restart);
 
-         // LogPrintf("XELV2: Length is   %d\n",len);
 
 
         if (opt_benchmark)
@@ -393,105 +349,9 @@ int scanhash_xelisv2(int thr_id, struct work *work, uint32_t max_nonce, uint64_t
 
         do {
                 be32enc(&endiandata[19], nonce);
-		/*
-			 if (opt_debug) {
-				 for(int i=0;i<20;++i) {
-					printf("%" PRIu32, endiandata[i]);
-				  }
-				 printf(" - scan endiandata\n");
-			 }
-			 */
                 xelisv2_hash(endiandata, hash);
 
                 if (hash[7] <= Htarg && fulltest(hash, ptarget)) {
-			printf("Htarg is  %" PRIu32 "\n",Htarg);
-			printf("hash[7] is  %" PRIu32 "\n",hash[7]);
-			printf("This Hash is %" PRIu32 "\n",hash);
-			 applog(LOG_NOTICE, "hash[7] is below target");
-				 for(int i=0;i<8;++i) {
-			            printf("%d : %" PRIu32 " | ", i, hash[i]);
-				 }
-				 printf(" - our hash\n");
-			 sleep(5);
-                        work_set_target_ratio(work, hash);
-                        pdata[19] = nonce;
-                        *hashes_done = pdata[19] - first_nonce;
-                        return 1;
-                }
-                nonce++;
-		/*
-			if (opt_debug) {
-                                 applog(LOG_DEBUG, "scanhash_xelisv2: nonce increments to: %u \n",nonce);
-			}
-			*/
-
-        } while (nonce < max_nonce && !(*restart));
-
-        pdata[19] = nonce;
-        *hashes_done = pdata[19] - first_nonce + 1;
-        return 0;
-}
-
-
-/*
-   int scanhash_meme(int thr_id, struct work *work, uint32_t max_nonce, uint64_t *hashes_done)
-{
-        uint32_t _ALIGN(64) vhash[8];
-        uint32_t _ALIGN(64) endiandata[20];
-        uint32_t *pdata = work->data;
-        uint32_t *ptarget = work->target;
-
-        const uint32_t Htarg = ptarget[7];
-        const uint32_t first_nonce = pdata[19];
-        uint32_t n = first_nonce;
-
-        for (int k = 0; k < 19; k++)
-                be32enc(&endiandata[k], pdata[k]);
-
-        do {
-                be32enc(&endiandata[19], n);
-                meme_hash((char*) endiandata, (char*) vhash, 80);
-                if (vhash[7] < Htarg && fulltest(vhash, ptarget)) {
-                if (opt_debug) {
-                                 applog(LOG_DEBUG, "FOUND memehash hash: %x \n",vhash);
-                                 applog(LOG_DEBUG, "memehash vhash[7]: %x vs %x\n",vhash[7], Htarg);
-                }
-                        work_set_target_ratio( work, vhash );
-                        *hashes_done = n - first_nonce + 1;
-                        pdata[19] = n;
-                        return true;
-                }
-                n++;
-        } while (n < max_nonce && !work_restart[thr_id].restart);
-
-        *hashes_done = n - first_nonce + 1;
-        pdata[19] = n;
-
-        return 0;
-}
-int scanhash_x11(int thr_id, struct work *work, uint32_t max_nonce, uint64_t *hashes_done)
-{
-        uint32_t _ALIGN(128) hash[8];
-        uint32_t _ALIGN(128) endiandata[20];
-        uint32_t *pdata = work->data;
-        uint32_t *ptarget = work->target;
-
-        const uint32_t Htarg = ptarget[7];
-        const uint32_t first_nonce = pdata[19];
-        uint32_t nonce = first_nonce;
-        volatile uint8_t *restart = &(work_restart[thr_id].restart);
-
-        if (opt_benchmark)
-                ptarget[7] = 0x0cff;
-
-        for (int k=0; k < 19; k++)
-                be32enc(&endiandata[k], pdata[k]);
-
-        do {
-                be32enc(&endiandata[19], nonce);
-                x11hash(hash, endiandata);
-
-                if (hash[7] <= Htarg && fulltest(hash, ptarget)) {
                         work_set_target_ratio(work, hash);
                         pdata[19] = nonce;
                         *hashes_done = pdata[19] - first_nonce;
@@ -505,41 +365,3 @@ int scanhash_x11(int thr_id, struct work *work, uint32_t max_nonce, uint64_t *ha
         *hashes_done = pdata[19] - first_nonce + 1;
         return 0;
 }
-
-
-int scanhash_bmw512(int thr_id, struct work *work, uint32_t max_nonce, uint64_t *hashes_done)
-{
-        uint32_t _ALIGN(128) hash64[8];
-        uint32_t _ALIGN(128) endiandata[32];
-        uint32_t *pdata = work->data;
-        uint32_t *ptarget = work->target;
-
-        const uint32_t Htarg = ptarget[7];
-        const uint32_t first_nonce = pdata[19];
-
-        uint32_t n = first_nonce;
-
-        for (int i=0; i < 19; i++) {
-                be32enc(&endiandata[i], pdata[i]);
-        };
-
-        do {
-                pdata[19] = ++n;
-                be32enc(&endiandata[19], n);
-                bmw512_hash(hash64, endiandata);
-                if (((hash64[7]&0xFFFFFF00)==0) && fulltest(hash64, ptarget)) {
-                        work_set_target_ratio(work, hash64);
-                        *hashes_done = n - first_nonce + 1;
-                        pdata[19] = n;
-                        return 1;
-                }
-                n++;
-
-        } while (n < max_nonce && !work_restart[thr_id].restart);
-
-        *hashes_done = n - first_nonce + 1;
-        pdata[19] = n;
-
-        return 0;
-}
-*/

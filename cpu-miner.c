@@ -2593,6 +2593,7 @@ static void *miner_thread(void *userdata)
 		if (rc && !opt_benchmark) {
 			if (!submit_work(mythr, &work))
 				break;
+			 applog(LOG_NOTICE, "Work submitted");
 			// prevent stale work in solo
 			// we can't submit twice a block!
 			if (!have_stratum && !have_longpoll) {
