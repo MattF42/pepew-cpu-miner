@@ -5,6 +5,11 @@ pepepow-cpu-miner
 This is a multi-threaded CPU miner,
 fork of [pooler](//github.com/pooler)'s cpuminer (see AUTHORS for list of contributors).
 
+It has been updated specifically to mine PEPEPOW directly against a node, with Xelisv2 as the hash algo.
+Don't expect it to work with any other based Xelis coins, or via a stratum as this is ONLY the transplanting of XelisV2
+into a classic GetWork/GBT UTXO based chain, and NOT an implementation of Xatum, or the XelisV2 stratum protocol at this stage.
+
+
 #### Table of contents
 
 * [Algorithms](#algorithms)
