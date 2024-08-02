@@ -1,7 +1,6 @@
-termux-miner
+pepepow-cpu-miner
 ==============
 
-[![Build Status](https://travis-ci.org/tpruvot/cpuminer-multi.svg)](https://travis-ci.org/tpruvot/cpuminer-multi)
 
 This is a multi-threaded CPU miner,
 fork of [pooler](//github.com/pooler)'s cpuminer (see AUTHORS for list of contributors).
@@ -73,6 +72,7 @@ Algorithms
  * ✓ __veltor__ (Veltor [VLT])
  * ✓ __velvet__
  * ✓ __xevan__ x17 x 2 on bigger header (BitSend [BSD])
+ * ✓ __xelisv2__ XelisHashV2  [PepePOW HardFork, maybe XEL])
  * ✓ __x11evo__ (Revolver [XRE])
  * ✓ __x11__ (Darkcoin [DRK], Hirocoin, Limecoin, ...)
  * ✓ __x12__ (GalaxyCash [GCH])
