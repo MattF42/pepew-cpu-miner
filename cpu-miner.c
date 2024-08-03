@@ -1805,6 +1805,9 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			case ALGO_YESPOWER_MGPC:
 			case ALGO_YESPOWERSUGAR:
 			case ALGO_YESPOWERTIDE:
+			case ALGO_XELISV2:
+				work_set_target(work, sctx->job.diff / (65536.0 * opt_diff_factor));
+				break;
 			case ALGO_YESPOWERURX:
 				work_set_target(work, sctx->job.diff / (65536.0 * opt_diff_factor));
 				break;
