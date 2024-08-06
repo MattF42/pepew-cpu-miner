@@ -307,23 +307,19 @@ void xel_stage_3(uint64_t *scratch)
 }
 
 #define XEL_INPUT_LEN (112)
-void xelisv2_hash(const uint32_t* input, uint32_t* output)
+void xelisv2_hash(const uint32_t* input, uint32_t* output, uint8_t* xel_input, uint64_t* scratch)
 {
 
-	uint8_t *xel_input = (uint8_t *)calloc(INPUT_LEN, sizeof(uint8_t));
-        uint64_t *scratch = (uint64_t *)calloc(MEMSIZE, sizeof(uint64_t));
         uint8_t *scratch_uint8 = (uint8_t *)scratch;
 	uint8_t hash[HASHSIZE];
 	int len=80; // #FixMe
 
-			memcpy(xel_input, input, len);
+			memcpy(xel_input, input, len);  // Ensure we have correct hash input only with trailing 0 as needed
                         xel_stage_1(xel_input, XEL_INPUT_LEN, scratch_uint8);
                         xel_stage_3(scratch);
-                        blake3(scratch_uint8, OUTPUT_SIZE, hash);
+                        blake3(scratch_uint8, OUTPUT_SIZE, output);
 
-			memcpy(output,hash,HASHSIZE*sizeof(uint8_t)); // Back to uint_32t
-		        free(scratch);	
-		        free(xel_input);	
+			// memcpy(output,hash,HASHSIZE*sizeof(uint8_t)); // Back to uint_32t /* Seems to be unecessary */
                         return;
 }
 
@@ -340,6 +336,8 @@ int scanhash_xelisv2(int thr_id, struct work *work, uint32_t max_nonce, uint64_t
         volatile uint8_t *restart = &(work_restart[thr_id].restart);
 
 
+	uint8_t *xel_input = (uint8_t *)calloc(INPUT_LEN, sizeof(uint8_t));
+        uint64_t *scratch = (uint64_t *)calloc(MEMSIZE, sizeof(uint64_t));
 
         if (opt_benchmark)
                 ptarget[7] = 0x0cff;
@@ -349,12 +347,14 @@ int scanhash_xelisv2(int thr_id, struct work *work, uint32_t max_nonce, uint64_t
 
         do {
                 be32enc(&endiandata[19], nonce);
-                xelisv2_hash(endiandata, hash);
+                xelisv2_hash(endiandata, hash, xel_input, scratch);
 
                 if (hash[7] <= Htarg && fulltest(hash, ptarget)) {
                         work_set_target_ratio(work, hash);
                         pdata[19] = nonce;
                         *hashes_done = pdata[19] - first_nonce;
+		        free(scratch);	
+		        free(xel_input);	
                         return 1;
                 }
                 nonce++;
@@ -363,5 +363,7 @@ int scanhash_xelisv2(int thr_id, struct work *work, uint32_t max_nonce, uint64_t
 
         pdata[19] = nonce;
         *hashes_done = pdata[19] - first_nonce + 1;
+        free(scratch);	
+        free(xel_input);	
         return 0;
 }
