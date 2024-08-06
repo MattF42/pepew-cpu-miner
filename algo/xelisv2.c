@@ -311,7 +311,7 @@ void xelisv2_hash(const uint32_t* input, uint32_t* output, uint8_t* xel_input, u
 {
 
         uint8_t *scratch_uint8 = (uint8_t *)scratch;
-	uint8_t hash[HASHSIZE];
+	//  uint8_t hash[HASHSIZE];  // See Below
 	int len=80; // #FixMe
 
 			memcpy(xel_input, input, len);  // Ensure we have correct hash input only with trailing 0 as needed
@@ -319,7 +319,8 @@ void xelisv2_hash(const uint32_t* input, uint32_t* output, uint8_t* xel_input, u
                         xel_stage_3(scratch);
                         blake3(scratch_uint8, OUTPUT_SIZE, output);
 
-			// memcpy(output,hash,HASHSIZE*sizeof(uint8_t)); // Back to uint_32t /* Seems to be unecessary */
+                        // blake3(scratch_uint8, OUTPUT_SIZE, hash); // This appears to be uncessary, but the compiler complains...
+			// memcpy(output,hash,HASHSIZE*sizeof(uint8_t)); // See above ^^^^^^^
                         return;
 }
 
