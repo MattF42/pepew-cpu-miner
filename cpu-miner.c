@@ -2046,38 +2046,37 @@ static void *miner_thread(void *userdata)
 					max64 = 0xF;
 				break;
 			case ALGO_AXIOM:
-			case ALGO_SCRYPTJANE:
-				max64 = 0x40LL;
-				break;
-			case ALGO_DROP:
-			case ALGO_GR:
-			case ALGO_MIKE:
-			case ALGO_MINOTAUR:
-			case ALGO_MINOTAURX:
-			case ALGO_PLUCK:
-			case ALGO_YESCRYPT:
-			case ALGO_YESCRYPTR8:
-				max64 = 0x1ff;
-				break;
-			case ALGO_YESCRYPTR16:
-			case ALGO_YESCRYPTR32:
-				max64 = 0xfff;
-				break;
-			case ALGO_CPUPOWER:
-			case ALGO_POWER2B:
-			case ALGO_YESPOWER:
-			case ALGO_YESPOWERR16:
-			case ALGO_YESPOWERIC:
-			case ALGO_YESPOWERIOTS:
-			case ALGO_YESPOWERITC:
-			case ALGO_YESPOWERLITB:
-			case ALGO_YESPOWERLNC:
-			case ALGO_YESPOWER_MGPC:
-			case ALGO_YESPOWERSUGAR:
-			case ALGO_YESPOWERTIDE:
-			case ALGO_YESPOWERURX:
-				max64 = 499;
-				break;
+                        case ALGO_SCRYPTJANE:
+                            max64 = 0x40LL;
+                            break;
+                        case ALGO_CPUPOWER:
+                        case ALGO_DROP:
+                        case ALGO_GR:
+                        case ALGO_MIKE:
+                        case ALGO_MINOTAUR:
+                        case ALGO_MINOTAURX:
+                        case ALGO_PLUCK:
+                        case ALGO_POWER2B:
+                        case ALGO_YESCRYPT:
+                        case ALGO_YESCRYPTR8:
+                        case ALGO_YESPOWER:
+                        case ALGO_YESPOWERR16:
+                        case ALGO_YESPOWERIC:
+                        case ALGO_YESPOWERIOTS:
+                        case ALGO_YESPOWERITC:
+                        case ALGO_YESPOWERLITB:
+                        case ALGO_YESPOWERLNC:
+                        case ALGO_YESPOWER_MGPC:
+                        case ALGO_YESPOWERSUGAR:
+                        case ALGO_YESPOWERTIDE:
+                        case ALGO_YESPOWERURX:
+                               max64 = 0x1ff; // 511 DEC
+                               break;
+                        case ALGO_YESCRYPTR16:
+                        case ALGO_YESCRYPTR32:
+                        case ALGO_XELISV2:
+                               max64 = 0xfff; // 4095 DEC
+                               break;
 			case ALGO_ALLIUM:
 			case ALGO_ANIME:
 			case ALGO_DEDAL:
@@ -2126,7 +2125,6 @@ static void *miner_thread(void *userdata)
 				max64 = 0x3ffff;
 				break;
 			case ALGO_MEME:
-			case ALGO_XELISV2:
 				max64 = 0x9ffffLL;
 				break;
 			case ALGO_SKEIN:
