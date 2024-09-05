@@ -17,6 +17,10 @@
 #if defined(_M_X64) || defined(__x86_64__)
 #include <wmmintrin.h>
 #endif
+#if defined(__aarch64__)
+  #include <arm_neon.h>
+#endif
+
 
 #define INPUT_LEN (112)
 #define MEMSIZE (429 * 128)
@@ -328,8 +332,14 @@ void static inline aes_single_round(uint8_t *block, const uint8_t *key)
 	block_vec = _mm_aesenc_si128(block_vec, key_vec);
 
 	_mm_storeu_si128((__m128i *)block, block_vec);
+#elif defined(__aarch64__)
+    uint8x16_t blck = vld1q_u8(block);
+    uint8x16_t ky = vld1q_u8(key);
+    // This magic sauce is from here: https://blog.michaelbrase.com/2018/06/04/optimizing-x86-aes-intrinsics-on-armv8-a/
+    uint8x16_t rslt = vaesmcq_u8(vaeseq_u8(blck, (uint8x16_t){})) ^ ky;
+    vst1q_u8(block, rslt);
 #else
-  aes_single_round_no_intrinsics(block, key);
+   aes_single_round_no_intrinsics(block, key);
 #endif
 }
 
