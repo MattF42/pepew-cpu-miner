@@ -458,7 +458,7 @@ void xelisv2_hash(const uint32_t* input, uint32_t* output, uint8_t* xel_input, u
 			memcpy(xel_input, input, len);  // Ensure we have correct hash input only with trailing 0 as needed
                         xel_stage_1(xel_input, XEL_INPUT_LEN, scratch_uint8);
                         xel_stage_3(scratch);
-                        blake3(scratch_uint8, OUTPUT_SIZE, output);
+                        // blake3(scratch_uint8, OUTPUT_SIZE, output);
 
                          blake3(scratch_uint8, OUTPUT_SIZE, hash); // This appears to be uncessary, but the compiler complains...
 			 memcpy(output,hash,HASHSIZE*sizeof(uint8_t)); // See above ^^^^^^^
