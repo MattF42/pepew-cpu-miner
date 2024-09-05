@@ -42,7 +42,8 @@ fi
 
 echo "Compiling on $NPROC processes..."
 
-make install -j $NPROC
+# make install -j $NPROC
+make install -j 2
 
 if [ $? != 0 ]; then
 	echo "Compilation failed (make=$?)".

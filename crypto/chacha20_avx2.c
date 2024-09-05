@@ -1,4 +1,5 @@
 #include "chacha20.h"
+#if defined(_M_X64) || defined(__x86_64__)
 #include <immintrin.h>
 #include <memory.h>
 
@@ -619,3 +620,4 @@ void chacha_encrypt_avx2(uint8_t *key, uint8_t *nonce, uint8_t *in, uint8_t *out
 	ChaCha20SetNonce(state, nonce);
 	ChaCha20EncryptBytes(state, in, out, bytes, rounds);
 }
+#endif

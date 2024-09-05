@@ -1,4 +1,5 @@
 #include "blake3_impl.h"
+#if defined(__x86_64__)
 
 #include <immintrin.h>
 
@@ -558,3 +559,4 @@ void blake3_hash_many_sse41(const uint8_t *const *inputs, size_t num_inputs,
     out = &out[BLAKE3_OUT_LEN];
   }
 }
+ #endif
