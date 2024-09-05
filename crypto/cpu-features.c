@@ -1,6 +1,7 @@
 // CPU features set
 #include "cpu-features.h"
 
+#if defined(_M_X64) || defined(__x86_64__)
 static void cpuid(int cpuinfo[4], int info_type)
 {
     __asm__ __volatile__(
@@ -69,3 +70,4 @@ void get_cpu_features(cpu_features_t *f)
         f->HW_XOP = (info[2] & ((int)1 << 11)) != 0;
     }
 }
+#endif
