@@ -310,7 +310,7 @@ static void add_round_key(uint8_t *state, const uint8_t *round_key) {
 }
 
 
-inline void aes_single_round_no_intrinsics(uint8_t *state, const uint8_t *round_key) {
+void aes_single_round_no_intrinsics(uint8_t *state, const uint8_t *round_key) {
     sub_bytes(state);
     shift_rows(state);
     mix_columns(state);
