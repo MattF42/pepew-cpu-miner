@@ -24,6 +24,7 @@ cpuminer_SOURCES = \
   crypto/blake3_sse2.c \
   crypto/blake3_sse41.c \
   crypto/blake3_avx2.c \
+  crypto/blake3_neon.c \
   crypto/chacha20.c \
   crypto/chacha20_dispatch.c \
   crypto/chacha20_sse2.c \
