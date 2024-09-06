@@ -17,7 +17,7 @@
 #if defined(_M_X64) || defined(__x86_64__)
 #include <wmmintrin.h>
 #endif
-#if defined(__aarch64__)
+#if defined(__ARM_NEON)
   #include <arm_neon.h>
 #endif
 
@@ -323,7 +323,8 @@ void aes_single_round_no_intrinsics(uint8_t *state, const uint8_t *round_key) {
 
 void static inline aes_single_round(uint8_t *block, const uint8_t *key)
 {
-#if defined(_M_X64) || defined(__x86_64__)
+#if defined(__AES__) || defined(__ARM_FEATURE_AES)
+  #if defined(_M_X64) || defined(__x86_64__)
 
 	__m128i block_vec = _mm_loadu_si128((const __m128i *)block);
 	__m128i key_vec = _mm_loadu_si128((const __m128i *)key);
@@ -332,12 +333,13 @@ void static inline aes_single_round(uint8_t *block, const uint8_t *key)
 	block_vec = _mm_aesenc_si128(block_vec, key_vec);
 
 	_mm_storeu_si128((__m128i *)block, block_vec);
-#elif defined(__aarch64__)
+  #elif defined(__ARM_FEATURE_AES)
     uint8x16_t blck = vld1q_u8(block);
     uint8x16_t ky = vld1q_u8(key);
     // This magic sauce is from here: https://blog.michaelbrase.com/2018/06/04/optimizing-x86-aes-intrinsics-on-armv8-a/
     uint8x16_t rslt = vaesmcq_u8(vaeseq_u8(blck, (uint8x16_t){})) ^ ky;
     vst1q_u8(block, rslt);
+  #endif
 #else
    aes_single_round_no_intrinsics(block, key);
 #endif
