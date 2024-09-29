@@ -1,6 +1,6 @@
 #include "blake3_impl.h"
 
-#if defined(_M_X64) || defined(__x86_64__)
+#if (defined(_M_X64) || defined(__x86_64__)) && defined(__AVX2__)
 #include <immintrin.h>
 
 #define DEGREE 8

@@ -4,6 +4,17 @@
 
 
 #define BLAKE3_NO_AVX512 // Foztor - until we can get this to compile...
+
+#if !defined(__AVX2__)
+#define BLAKE3_NO_AVX2
+#endif
+#if !defined(__SSE41__)
+#define BLAKE3_NO_SSE41
+#endif
+#if !defined(__SSE2__)
+#define BLAKE3_NO_SSE2
+#endif
+
 #include "blake3_impl.h"
 
 #if defined(_MSC_VER)
@@ -232,7 +243,7 @@ void blake3_hash_many(const uint8_t *const *inputs, size_t num_inputs,
 #if defined(IS_X86)
   const enum cpu_feature features = get_cpu_features();
   MAYBE_UNUSED(features);
-#if !defined(BLAKE3_NO_AVX512)
+#if !defined(BLAKE3_NO_AVX512) && defined(__AVX512F__) && defined(__AVX512VL__)
   if ((features & (AVX512F|AVX512VL)) == (AVX512F|AVX512VL)) {
     blake3_hash_many_avx512(inputs, num_inputs, blocks, key, counter,
                             increment_counter, flags, flags_start, flags_end,

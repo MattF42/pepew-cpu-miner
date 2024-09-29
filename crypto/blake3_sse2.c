@@ -1,6 +1,6 @@
 #include "blake3_impl.h"
 
-#if defined(__x86_64__)
+#if defined(__x86_64__) && defined(__SSE2__)
 #include <immintrin.h>
 
 #define DEGREE 4

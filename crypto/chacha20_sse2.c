@@ -1,5 +1,5 @@
 #include "chacha20.h"
-#if defined(_M_X64) || defined(__x86_64__)
+#if (defined(_M_X64) || defined(__x86_64__)) && defined(__SSE2__)
 #include <immintrin.h>
 #include <memory.h>
 
