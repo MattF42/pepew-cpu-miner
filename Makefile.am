@@ -32,7 +32,8 @@ cpuminer_SOURCES = \
   crypto/cpu-features.c \
   crypto/hash.c \
   algo/xelisv2.c \
-  algo/sha2.c
+  algo/sha2.c \
+  algo/hoohash.c
 
 disable_flags =
 

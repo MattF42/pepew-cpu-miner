@@ -2,6 +2,7 @@ enum algos {
 	ALGO_KECCAK,      /* Keccak (old) */
 	ALGO_KECCAKC,     /* Keccak */
 	ALGO_HEAVY,       /* Heavy */
+	ALGO_HOOHASH,     /* Hoohash-pepew */
 	ALGO_NEOSCRYPT,   /* NeoScrypt(128, 2, 1) with Salsa20/20 and ChaCha20/20 */
 	ALGO_QUARK,       /* Quark */
 	ALGO_ALLIUM,      /* Garlicoin double lyra2 */
@@ -98,6 +99,7 @@ static const char *algo_names[] = {
 	"keccak",
 	"keccakc",
 	"heavy",
+        "hoohash-pepew",
 	"neoscrypt",
 	"quark",
 	"allium",

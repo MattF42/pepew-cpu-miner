@@ -184,6 +184,7 @@ Usage: ./"PROGRAMNAME " [OPTIONS]\n\
 Options:\n\
   -a, --algo=ALGO       specify the algorithm to use\n\
                           xelisv2        XelisV2 (PepePoW)\n\
+                          hoohash        HoohashV110-pepew\n\
   -o, --url=URL           URL of mining server\n\
   -O, --userpass=U:P      username:password pair for mining server\n\
   -u, --user=USERNAME     username for mining server\n\
@@ -1711,8 +1712,7 @@ static void stratum_gen_work(struct stratum_ctx *sctx, struct work *work)
 			case ALGO_YESPOWERSUGAR:
 			case ALGO_YESPOWERTIDE:
 			case ALGO_XELISV2:
-				work_set_target(work, sctx->job.diff / (65536.0 * opt_diff_factor));
-				break;
+			case ALGO_HOOHASH:
 			case ALGO_YESPOWERURX:
 				work_set_target(work, sctx->job.diff / (65536.0 * opt_diff_factor));
 				break;
@@ -2075,6 +2075,7 @@ static void *miner_thread(void *userdata)
                         case ALGO_YESCRYPTR16:
                         case ALGO_YESCRYPTR32:
                         case ALGO_XELISV2:
+			case ALGO_HOOHASH:
                                max64 = 0xfff; // 4095 DEC
                                break;
 			case ALGO_ALLIUM:
@@ -2160,6 +2161,9 @@ static void *miner_thread(void *userdata)
 
 		case ALGO_XELISV2:
 			rc = scanhash_xelisv2(thr_id, &work, max_nonce, &hashes_done);
+			break;
+		case ALGO_HOOHASH:
+			rc = scanhash_hoohash_pepew(thr_id, &work, max_nonce, &hashes_done);
 			break;
 		default:
 			/* should never happen  - unless someone specifices not Xelis V2*/
@@ -2656,11 +2660,39 @@ void parse_arg(int key, char *arg)
 	int v, i;
 	uint64_t ul;
 	double d;
-        opt_algo = ALGO_XELISV2;
 
 	switch(key) {
 	case 'a':
-				applog(LOG_WARNING, "It is not longer possible to specify the algo ignoring -a parameter: '%s'", arg);
+		for (i = 0; i < ALGO_COUNT; i++) {
+			v = (int) strlen(algo_names[i]);
+			if (v && !strncasecmp(arg, algo_names[i], v)) {
+				if (arg[v] == '\0') {
+					opt_algo = (enum algos) i;
+					break;
+				}
+			}
+		}
+		if (i == ALGO_COUNT) {
+
+			if (strstr(arg, ":")) {
+				// pick and strip the optional factor
+				char *nf = strstr(arg, ":");
+				opt_scrypt_n = strtol(&nf[1], NULL, 10);
+				*nf = '\0';
+			}
+
+			// some aliases...
+			if (!strcasecmp("hoohash-pepew", arg))
+				i = opt_algo = ALGO_HOOHASH;
+			else if (!strcasecmp("xelisv2-pepew", arg))
+				i = opt_algo = ALGO_XELISV2;
+			else
+				applog(LOG_ERR, "Unknown algo parameter '%s'", arg);
+		}
+		if (i == ALGO_COUNT) {
+			show_usage_and_exit(1);
+		}
+
 		break;
 	case 'b':
 		p = strstr(arg, ":");

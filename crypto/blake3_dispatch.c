@@ -2,19 +2,6 @@
 #include <stddef.h>
 #include <stdint.h>
 
-
-#define BLAKE3_NO_AVX512 // Foztor - until we can get this to compile...
-
-#if !defined(__AVX2__)
-#define BLAKE3_NO_AVX2
-#endif
-#if !defined(__SSE41__)
-#define BLAKE3_NO_SSE41
-#endif
-#if !defined(__SSE2__)
-#define BLAKE3_NO_SSE2
-#endif
-
 #include "blake3_impl.h"
 
 #if defined(_MSC_VER)

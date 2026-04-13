@@ -1,4 +1,4 @@
-AC_INIT([pepew-cpu-miner], [3.1.3])
+AC_INIT([pepew-cpu-miner], [4.4.1])
 
 AC_PREREQ([2.59c])
 AC_CANONICAL_SYSTEM

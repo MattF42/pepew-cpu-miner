@@ -28,7 +28,7 @@ enum blake3_flags {
 #define INLINE static inline __attribute__((always_inline))
 #endif
 
-#if (defined(__x86_64__) || defined(_M_X64)) && !defined(_M_ARM64EC)
+#if (defined(__x86_64__) || defined(__amd64__) || defined(_M_X64)) && !defined(_M_ARM64EC)
 #define IS_X86
 #define IS_X86_64
 #endif
@@ -48,7 +48,19 @@ enum blake3_flags {
 #endif
 #endif
 
-#if !defined(BLAKE3_USE_NEON) 
+#define BLAKE3_NO_AVX512 // Foztor - until we can get this to compile...
+
+#if !defined(__AVX2__)
+#define BLAKE3_NO_AVX2
+#endif
+#if !defined(__SSE41__)
+#define BLAKE3_NO_SSE41
+#endif
+#if !defined(__SSE2__)
+#define BLAKE3_NO_SSE2
+#endif
+
+#if !defined(BLAKE3_USE_NEON)
   // If BLAKE3_USE_NEON not manually set, autodetect based on AArch64ness
   #if defined(IS_AARCH64)
     #if defined(__ARM_BIG_ENDIAN)
@@ -231,7 +243,7 @@ void blake3_hash_many_sse2(const uint8_t *const *inputs, size_t num_inputs,
                            uint64_t counter, bool increment_counter,
                            uint8_t flags, uint8_t flags_start,
                            uint8_t flags_end, uint8_t *out);
-#endif
+#endif // NO_SSE2
 #if !defined(BLAKE3_NO_SSE41)
 void blake3_compress_in_place_sse41(uint32_t cv[8],
                                     const uint8_t block[BLAKE3_BLOCK_LEN],
@@ -246,14 +258,14 @@ void blake3_hash_many_sse41(const uint8_t *const *inputs, size_t num_inputs,
                             uint64_t counter, bool increment_counter,
                             uint8_t flags, uint8_t flags_start,
                             uint8_t flags_end, uint8_t *out);
-#endif
+#endif // NO_SSE41
 #if !defined(BLAKE3_NO_AVX2)
 void blake3_hash_many_avx2(const uint8_t *const *inputs, size_t num_inputs,
                            size_t blocks, const uint32_t key[8],
                            uint64_t counter, bool increment_counter,
                            uint8_t flags, uint8_t flags_start,
                            uint8_t flags_end, uint8_t *out);
-#endif
+#endif // NO_AVX2
 #if !defined(BLAKE3_NO_AVX512)
 void blake3_compress_in_place_avx512(uint32_t cv[8],
                                      const uint8_t block[BLAKE3_BLOCK_LEN],
@@ -270,10 +282,10 @@ void blake3_hash_many_avx512(const uint8_t *const *inputs, size_t num_inputs,
                              uint64_t counter, bool increment_counter,
                              uint8_t flags, uint8_t flags_start,
                              uint8_t flags_end, uint8_t *out);
-#endif
-#endif
+#endif // NO_AVX512
+#endif // IS_X86
 
-#if BLAKE3_USE_NEON == 1
+#if defined(BLAKE3_USE_NEON)
 void blake3_hash_many_neon(const uint8_t *const *inputs, size_t num_inputs,
                            size_t blocks, const uint32_t key[8],
                            uint64_t counter, bool increment_counter,
