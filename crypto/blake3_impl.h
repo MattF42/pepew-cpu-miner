@@ -60,6 +60,10 @@ enum blake3_flags {
 #define BLAKE3_NO_SSE2
 #endif
 
+#if defined(__ARM__NEON)
+#define BLAKE3_USE_NEON 1
+#endif
+
 #if !defined(BLAKE3_USE_NEON)
   // If BLAKE3_USE_NEON not manually set, autodetect based on AArch64ness
   #if defined(IS_AARCH64)
